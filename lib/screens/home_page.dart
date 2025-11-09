@@ -114,7 +114,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Future<Map<String, Map<String, dynamic>>> marineDataFuture =
       fetchMarineData();
-  
+
   List<Map<String, dynamic>> places = [];
   bool isLoadingPlaces = true;
 
@@ -126,9 +126,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadPlacesData() async {
     try {
-      final String jsonString = await rootBundle.loadString('assets/places.json');
+      final String jsonString =
+          await rootBundle.loadString('assets/places.json');
       final Map<String, dynamic> jsonData = json.decode(jsonString);
-      
+
       setState(() {
         places = List<Map<String, dynamic>>.from(jsonData['places']);
         isLoadingPlaces = false;
@@ -161,7 +162,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 10),
-            
+
             // Marine Data Grid Section
             Padding(
               padding: const EdgeInsets.all(20),
@@ -185,7 +186,8 @@ class _HomePageState extends State<HomePage> {
                         return const Center(
                           child: Padding(
                             padding: EdgeInsets.all(30.0),
-                            child: CircularProgressIndicator(color: Colors.white),
+                            child:
+                                CircularProgressIndicator(color: Colors.white),
                           ),
                         );
                       }
@@ -199,8 +201,8 @@ class _HomePageState extends State<HomePage> {
                         crossAxisSpacing: 20,
                         mainAxisSpacing: 20,
                         childAspectRatio: 1.2,
-                        padding:
-                            const EdgeInsets.only(left: 16, bottom: 16, top: 16),
+                        padding: const EdgeInsets.only(
+                            left: 16, bottom: 16, top: 16),
                         children: <Widget>[
                           DataGridElement(
                             title: 'WIND',
@@ -281,7 +283,7 @@ class _HomePageState extends State<HomePage> {
                           },
                         ),
                       ),
-            
+
             const SizedBox(height: 100), // Space for bottom navigation
           ],
         ),
@@ -544,7 +546,7 @@ class _CustomNavigationBar extends StatelessWidget {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    // Start trip action
+                    Navigator.pushNamed(context, AppRoutes.activity);
                   },
                   borderRadius: BorderRadius.circular(centerButtonSize / 2),
                   child: const Icon(
