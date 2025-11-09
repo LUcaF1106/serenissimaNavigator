@@ -1,0 +1,81 @@
+{
+  "places": [
+    {
+      "name": "Barene di Venezia",
+      "description": "Typical salt marshes of the Venetian Lagoon, partially submerged at high tide, essential for lagoon biodiversity and ecosystem balance.",
+      "latitude": 45.4550,
+      "longitude": 12.3600,
+      "category": "nature"
+    },
+    {
+      "name": "Valle Averto",
+      "description": "A WWF protected natural reserve in the southern lagoon, composed of wetlands, fish farms, and reed beds hosting numerous bird species.",
+      "latitude": 45.3850,
+      "longitude": 12.1460,
+      "category": "nature"
+    },
+    {
+      "name": "Isola di Torcello",
+      "description": "One of the oldest inhabited islands in the lagoon, surrounded by calm canals and marshland rich in birds and aquatic vegetation.",
+      "latitude": 45.4947,
+      "longitude": 12.4177,
+      "category": "mixed"
+    },
+    {
+      "name": "Isola di Burano",
+      "description": "A colorful fishing island surrounded by lagoon shallows and natural canals, preserving traditional lagoon architecture and culture.",
+      "latitude": 45.4856,
+      "longitude": 12.4175,
+      "category": "mixed"
+    },
+    {
+      "name": "Isola di Mazzorbo",
+      "description": "A quiet green island connected to Burano by a bridge, with vineyards, orchards, and traces of ancient settlements.",
+      "latitude": 45.4865,
+      "longitude": 12.4112,
+      "category": "mixed"
+    },
+    {
+      "name": "Isola di Sant’Erasmo",
+      "description": "The largest island in the lagoon, known as the 'vegetable garden of Venice' for its agricultural fields and nature trails.",
+      "latitude": 45.4630,
+      "longitude": 12.3875,
+      "category": "nature"
+    },
+    {
+      "name": "Isola di San Francesco del Deserto",
+      "description": "A small, tranquil island covered by cypress trees, inhabited by Franciscan friars since the 13th century and surrounded by quiet lagoon waters.",
+      "latitude": 45.4870,
+      "longitude": 12.4170,
+      "category": "mixed"
+    },
+    {
+      "name": "Barena di Campalto",
+      "description": "A lagoon wetland area near the northern edge of Venice, rich in birdlife and tidal vegetation, part of the delicate lagoon ecosystem.",
+      "latitude": 45.4820,
+      "longitude": 12.2970,
+      "category": "nature"
+    },
+    {
+      "name": "Isola della Certosa",
+      "description": "An island turned into a green park and natural oasis, offering wildlife habitats and sustainable tourism near Venice.",
+      "latitude": 45.4394,
+      "longitude": 12.3592,
+      "category": "nature"
+    },
+    {
+      "name": "Laguna Sud di Chioggia",
+      "description": "The southern sector of the Venetian Lagoon, characterized by natural channels, sandbanks, and traditional fishing valleys.",
+      "latitude": 45.2500,
+      "longitude": 12.2900,
+      "category": "nature"
+    },
+    {
+      "name": "Canale di San Felice",
+      "description": "A navigable natural channel connecting various islands and sandbanks, surrounded by marsh vegetation and calm waters.",
+      "latitude": 45.5200,
+      "longitude": 12.4500,
+      "category": "nature"
+    }
+  ]
+}
