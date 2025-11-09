@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'package:serenissima/service/request.dart';
 import '../routes/app_routes.dart';
 
@@ -99,122 +101,364 @@ class DataGridElement extends StatelessWidget {
 }
 
 // ---
-// 2. HOMEPAGE REFACTORING
+// 2. HOMEPAGE WITH PLACES SECTION
 // ---
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final Future<Map<String, Map<String, dynamic>>> marineDataFuture =
       fetchMarineData();
+  
+  List<Map<String, dynamic>> places = [];
+  bool isLoadingPlaces = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadPlacesData();
+  }
+
+  Future<void> loadPlacesData() async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/places.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      
+      setState(() {
+        places = List<Map<String, dynamic>>.from(jsonData['places']);
+        isLoadingPlaces = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingPlaces = false;
+      });
+      print('Error loading places: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          // Header Section
-          const Padding(
-            padding: EdgeInsets.only(top: 60, left: 20),
-            child: Text(
-              'Hi Hackthon',
-              style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          // Main Content Section: GridView Card
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Card(
-              color: const Color.fromRGBO(6, 98, 143, 1),
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: FutureBuilder<Map<String, Map<String, dynamic>>>(
-                  future: marineDataFuture,
-                  builder: (context, snapshot) {
-                    // 1. Check for Errors
-                    if (snapshot.hasError) {
-                      return const Center(
-                          child: Text('Error loading marine data.'));
-                    }
-
-                    // 2. Check for Loading State
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(40.0),
-                          child: CircularProgressIndicator(color: Colors.white),
-                        ),
-                      );
-                    }
-
-                    // 3. Data is Ready (snapshot.data is the fetched map)
-                    final data = snapshot.data!;
-
-                    return GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 1.2,
-                      padding:
-                          const EdgeInsets.only(left: 16, bottom: 16, top: 16),
-
-                      // Use the fetched data to build the grid elements
-                      children: <Widget>[
-                        DataGridElement(
-                          title: 'WIND',
-                          value: data['WIND']!['value'],
-                          unit: data['WIND']!['unit'],
-                          icon: data['WIND']!['icon'],
-                        ),
-                        DataGridElement(
-                          title: 'WAVE HEIGHT',
-                          value: data['WAVE_HEIGHT']!['value'],
-                          unit: data['WAVE_HEIGHT']!['unit'],
-                          icon: data['WAVE_HEIGHT']!['icon'],
-                        ),
-                        DataGridElement(
-                          title: 'VISIBILITY',
-                          value: data['VISIBILITY']!['value'],
-                          unit: data['VISIBILITY']!['unit'],
-                          icon: data['VISIBILITY']!['icon'],
-                        ),
-                        DataGridElement(
-                          title: 'ALERT',
-                          value: data['ALERT']!['value'],
-                          unit: data['ALERT']!['unit'],
-                          icon: data['ALERT']!['icon'],
-                          iconColor:
-                              data['ALERT']!['iconColor'] ?? Colors.black,
-                        ),
-                      ],
-                    );
-                  },
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            // Header Section
+            const Padding(
+              padding: EdgeInsets.only(top: 60, left: 20),
+              child: Text(
+                'Hi Hackthon',
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 10),
+            
+            // Marine Data Grid Section
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Card(
+                color: _kPrimaryColor,
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: FutureBuilder<Map<String, Map<String, dynamic>>>(
+                    future: marineDataFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const Center(
+                            child: Text('Error loading marine data.'));
+                      }
+
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(30.0),
+                            child: CircularProgressIndicator(color: Colors.white),
+                          ),
+                        );
+                      }
+
+                      final data = snapshot.data!;
+
+                      return GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 1.2,
+                        padding:
+                            const EdgeInsets.only(left: 16, bottom: 16, top: 16),
+                        children: <Widget>[
+                          DataGridElement(
+                            title: 'WIND',
+                            value: data['WIND']!['value'],
+                            unit: data['WIND']!['unit'],
+                            icon: data['WIND']!['icon'],
+                          ),
+                          DataGridElement(
+                            title: 'WAVE HEIGHT',
+                            value: data['WAVE_HEIGHT']!['value'],
+                            unit: data['WAVE_HEIGHT']!['unit'],
+                            icon: data['WAVE_HEIGHT']!['icon'],
+                          ),
+                          DataGridElement(
+                            title: 'VISIBILITY',
+                            value: data['VISIBILITY']!['value'],
+                            unit: data['VISIBILITY']!['unit'],
+                            icon: data['VISIBILITY']!['icon'],
+                          ),
+                          DataGridElement(
+                            title: 'ALERT',
+                            value: data['ALERT']!['value'],
+                            unit: data['ALERT']!['unit'],
+                            icon: data['ALERT']!['icon'],
+                            iconColor:
+                                data['ALERT']!['iconColor'] ?? Colors.black,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+
+            // Places Section
+            const Padding(
+              padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
+              child: Text(
+                'Interesting Places',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            // Places List
+            isLoadingPlaces
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(40.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : places.isEmpty
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: Text('No places found'),
+                        ),
+                      )
+                    : SizedBox(
+                        height: 200,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          itemCount: places.length,
+                          itemBuilder: (context, index) {
+                            final place = places[index];
+                            return PlaceCard(
+                              name: place['name'] ?? 'Unknown',
+                              description: place['description'] ?? '',
+                              latitude: (place['latitude'] ?? 0.0).toDouble(),
+                              longitude: (place['longitude'] ?? 0.0).toDouble(),
+                              category: place['category'] ?? 'unknown',
+                            );
+                          },
+                        ),
+                      ),
+            
+            const SizedBox(height: 100), // Space for bottom navigation
+          ],
+        ),
       ),
-      // Custom Bottom Navigation Bar (reused from previous step)
+      // Custom Bottom Navigation Bar
       bottomNavigationBar: const _CustomNavigationBar(),
     );
   }
 }
 
 // ---
-// 3. CUSTOM NAVIGATION BAR (for completeness)
+// 3. PLACE CARD WIDGET
+// ---
+
+class PlaceCard extends StatelessWidget {
+  final String name;
+  final String description;
+  final double latitude;
+  final double longitude;
+  final String category;
+
+  const PlaceCard({
+    super.key,
+    required this.name,
+    required this.description,
+    required this.latitude,
+    required this.longitude,
+    required this.category,
+  });
+
+  Color getCategoryColor() {
+    switch (category) {
+      case 'nature':
+        return Colors.green;
+      case 'mixed':
+        return Colors.orange;
+      default:
+        return _kPrimaryColor;
+    }
+  }
+
+  IconData getCategoryIcon() {
+    switch (category) {
+      case 'nature':
+        return Icons.nature;
+      case 'mixed':
+        return Icons.landscape;
+      default:
+        return Icons.place;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 300,
+      margin: const EdgeInsets.only(right: 16),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with category badge
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    getCategoryColor().withOpacity(0.8),
+                    getCategoryColor(),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    getCategoryIcon(),
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      category.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade700,
+                          height: 1.4,
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: _kPrimaryColor,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---
+// 4. CUSTOM NAVIGATION BAR
 // ---
 
 class _CustomNavigationBar extends StatelessWidget {
@@ -222,7 +466,6 @@ class _CustomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine screen width once
     final double screenWidth = MediaQuery.of(context).size.width;
     const double centerButtonSize = 70;
 
@@ -252,7 +495,6 @@ class _CustomNavigationBar extends StatelessWidget {
                 IconButton(
                   enableFeedback: false,
                   onPressed: () {
-                    // This assumes AppRoutes.map is defined and works
                     Navigator.pushNamed(context, AppRoutes.map);
                   },
                   icon: const Icon(Icons.map, color: Colors.white, size: 35),
